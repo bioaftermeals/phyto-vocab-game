@@ -10,11 +10,21 @@
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- ตั้งค่า Babel ให้ใช้ Classic Runtime ป้องกัน Error react/jsx-runtime -->
+    <script>
+        Babel.registerPreset('react-classic', {
+            presets: [
+                [Babel.availablePresets['react'], { "runtime": "classic" }]
+            ]
+        });
+    </script>
 </head>
 <body class="bg-green-50 min-h-screen">
     <div id="root"></div>
 
-    <script type="text/babel" data-type="module" data-presets="react">
+    <!-- ใช้ preset ที่เราตั้งค่าไว้ใหม่ และเอา data-type="module" ออก -->
+    <script type="text/babel" data-presets="react-classic">
         const { useState, useEffect, useMemo } = React;
 
         // ==========================================
