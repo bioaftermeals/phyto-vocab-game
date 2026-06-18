@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phyto! ภารกิจงอกศัพท์</title>
+    <!-- โหลด Tailwind CSS สำหรับตกแต่งสีสัน -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- โหลด React และ Babel สำหรับให้ระบบแอปทำงานได้ในไฟล์เดียว -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-green-50 min-h-screen">
+    <div id="root"></div>
+
+    <script type="text/babel" data-type="module" data-presets="react">
+        const { useState, useEffect, useMemo } = React;
+
+        // ==========================================
+        // 📚 คลังคำศัพท์ของคุณครู (แก้ข้อมูลตรงนี้ได้เลย)
+        // ==========================================
+        const INITIAL_VOCAB = [
+            { id: 1, term: "Meristematic Tissue", def: "เนื้อเยื่อเจริญ เซลล์ยังมีชีวิต นิวเคลียสใหญ่ ผนังเซลล์บาง แบ่งเซลล์ได้ตลอดชีวิต", category: "General", imageUrl: "https://placehold.co/600x400/bbf7d0/166534?text=Meristematic" },
+            { id: 2, term: "Apical Meristem", def: "เนื้อเยื่อเจริญส่วนปลาย (ปลายยอด/ปลายราก) ทำให้พืชยืดตัวยาวขึ้น (Primary growth)", category: "Meristem", imageUrl: "https://placehold.co/600x400/bbf7d0/166534?text=Apical+Meristem" },
+            { id: 3, term: "Lateral Meristem", def: "เนื้อเยื่อเจริญด้านข้าง (แคมเบียม) ทำให้พืชขยายออกด้านข้าง (Secondary growth)", category: "Meristem", imageUrl: "https://placehold.co/600x400/bbf7d0/166534?text=Lateral+Meristem" },
+            { id: 4, term: "Intercalary Meristem", def: "เนื้อเยื่อเจริญเหนือข้อ พบในพืชใบเลี้ยงเดี่ยว เช่น ไผ่ หญ้า ข้าว", category: "Meristem", imageUrl: "https://placehold.co/600x400/bbf7d0/166534?text=Intercalary" },
+            { id: 5, term: "Permanent Tissue", def: "เนื้อเยื่อถาวร เปลี่ยนแปลงมาจากเนื้อเยื่อเจริญ แบ่งเซลล์ไม่ได้แล้ว", category: "General", imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Permanent" },
+            { id: 6, term: "Epidermis", def: "เนื้อเยื่อผิว อยู่นอกสุด เซลล์เรียงชั้นเดียว ไม่มีคลอโรพลาสต์ (ยกเว้นเซลล์คุม)", category: "Permanent", imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Epidermis" },
+            { id: 7, term: "Parenchyma", def: "พาเรงคิมา เซลล์พื้นฐาน มีชีวิต ผนังเซลล์บาง มีช่องว่างระหว่างเซลล์ สะสมอาหารได้", category: "Permanent", imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Parenchyma" },
+            { id: 8, term: "Collenchyma", def: "คอลเลงคิมา ให้ความแข็งแรงแก่พืชอ่อน ผนังเซลล์หนาไม่เท่ากัน (หนาตามมุม)", category: "Permanent", imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Collenchyma" },
+            { id: 9, term: "Sclerenchyma", def: "สเคลอเรงคิมา เซลล์ตายแล้วตอนโตเต็มที่ ผนังเซลล์หนามาก (มีลิกนิน) ให้ความแข็งแรง", category: "Permanent", imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Sclerenchyma" },
+            { id: 10, term: "Xylem", def: "ไซเล็ม ท่อลำเลียงน้ำและแร่ธาตุ (ประกอบด้วย Tracheid, Vessel, Xylem parenchyma, Xylem fiber)", category: "Vascular", imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Xylem" },
+            { id: 11, term: "Phloem", def: "โฟลเอ็ม ท่อลำเลียงอาหาร/น้ำตาล (ประกอบด้วย Sieve tube, Companion cell, Phloem parenchyma, Phloem fiber)", category: "Vascular", imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Phloem" },
+            { id: 12, term: "Guard Cell", def: "เซลล์คุม เป็นเซลล์เอพิเดอร์มิสที่เปลี่ยนแปลงไปทำหน้าที่ควบคุมการเปิดปิดปากใบ (มีคลอโรพลาสต์)", category: "Permanent", imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Guard+Cell" },
+            { id: 13, term: "Sieve tube", def: "ท่อลำเลียงอาหารหลักใน Phloem ตอนโตเต็มที่จะไม่มีนิวเคลียส", category: "Vascular", imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Sieve+tube" },
+            { id: 14, term: "Companion cell", def: "เซลล์ประกบ อยู่ติดกับ Sieve tube คอยส่งพลังงานและควบคุมการทำงานให้ Sieve tube", category: "Vascular", imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Companion+cell" }
+        ];
+
+        // ==========================================
+        // ระบบโค้ดแอปพลิเคชัน (ไม่ต้องแก้)
+        // ==========================================
+        const PLANT_STAGES = [
+            { threshold: 0, name: 'เมล็ดพันธุ์', icon: '🌱' },
+            { threshold: 30, name: 'ต้นกล้า', icon: '🌿' },
+            { threshold: 70, name: 'ต้นไม้', icon: '🌳' },
+            { threshold: 100, name: 'โตเต็มวัย!', icon: '✨' }
+        ];
+
+        const PLANT_RESULTS = ['🌲', '🌴', '🌵', '🌻', '🌷', '🍄', '🍀'];
+
+        const App = () => {
+            // State ทั้งหมด
+            const [vocab] = useState(INITIAL_VOCAB);
+            const [xp, setXp] = useState(0);
+            const [waterDrops, setWaterDrops] = useState(0);
+            const [memorized, setMemorized] = useState([]);
+            const [collection, setCollection] = useState([]);
+            const [quizStats, setQuizStats] = useState({ total: 0, correct: 0 });
+            const [gardenName, setGardenName] = useState("สวนพฤกษศาสตร์ของฉัน");
+            
+            // หน้าต่าง UI
+            const [view, setView] = useState('home'); // home, flashcard, quiz, collection
+            const [filter, setFilter] = useState('All');
+            
+            // Flashcard State
+            const [cardIndex, setCardIndex] = useState(0);
+            const [isFlipped, setIsFlipped] = useState(false);
+            const [flashcardMode, setFlashcardMode] = useState('term'); // term, def, image
+            
+            // Quiz State
+            const [quizQuestions, setQuizQuestions] = useState([]);
+            const [currentQuestion, setCurrentQuestion] = useState(0);
+            const [quizScore, setQuizScore] = useState(0);
+            const [quizFinished, setQuizFinished] = useState(false);
+
+            // โหลดข้อมูลจาก LocalStorage
+            useEffect(() => {
+                const saved = localStorage.getItem('phytoAppState');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    setXp(parsed.xp || 0);
+                    setWaterDrops(parsed.waterDrops || 0);
+                    setMemorized(parsed.memorized || []);
+                    setCollection(parsed.collection || []);
+                    setQuizStats(parsed.quizStats || { total: 0, correct: 0 });
+                    setGardenName(parsed.gardenName || "สวนพฤกษศาสตร์ของฉัน");
+                }
+            }, []);
+
+            // บันทึกข้อมูลลง LocalStorage
+            useEffect(() => {
+                localStorage.setItem('phytoAppState', JSON.stringify({
+                    xp, waterDrops, memorized, collection, quizStats, gardenName
+                }));
+            }, [xp, waterDrops, memorized, collection, quizStats, gardenName]);
+
+            // คำนวณระยะต้นไม้
+            const currentStage = useMemo(() => {
+                return [...PLANT_STAGES].reverse().find(stage => xp >= stage.threshold) || PLANT_STAGES[0];
+            }, [xp]);
+
+            const categories = ['All', ...new Set(vocab.map(v => v.category))];
+            const filteredVocab = filter === 'All' ? vocab : vocab.filter(v => v.category === filter);
+
+            const handleWaterPlant = () => {
+                if (waterDrops >= 10 && xp < 100) {
+                    setWaterDrops(prev => prev - 10);
+                    setXp(prev => Math.min(prev + 10, 100));
+                }
+            };
+
+            const handleHarvest = () => {
+                if (xp >= 100) {
+                    const randomPlant = PLANT_RESULTS[Math.floor(Math.random() * PLANT_RESULTS.length)];
+                    setCollection([...collection, { id: Date.now(), type: randomPlant, date: new Date().toLocaleDateString() }]);
+                    setXp(0);
+                    setView('collection');
+                }
+            };
+
+            const markAsMemorized = (id) => {
+                if (!memorized.includes(id)) {
+                    setMemorized([...memorized, id]);
+                    setWaterDrops(prev => prev + 5);
+                }
+                setIsFlipped(false);
+                setCardIndex(prev => (prev + 1) % filteredVocab.length);
+            };
+
+            const startQuiz = () => {
+                const shuffled = [...vocab].sort(() => 0.5 - Math.random()).slice(0, 5);
+                const questions = shuffled.map(v => {
+                    const wrongOptions = vocab
+                        .filter(opt => opt.id !== v.id)
+                        .sort(() => 0.5 - Math.random())
+                        .slice(0, 3)
+                        .map(opt => opt.def);
+                    return {
+                        vocab: v,
+                        options: [v.def, ...wrongOptions].sort(() => 0.5 - Math.random())
+                    };
+                });
+                setQuizQuestions(questions);
+                setCurrentQuestion(0);
+                setQuizScore(0);
+                setQuizFinished(false);
+                setView('quiz');
+            };
+
+            const handleQuizAnswer = (selectedDef) => {
+                const isCorrect = selectedDef === quizQuestions[currentQuestion].vocab.def;
+                if (isCorrect) {
+                    setQuizScore(prev => prev + 1);
+                    setWaterDrops(prev => prev + 10);
+                }
+                
+                if (currentQuestion + 1 < quizQuestions.length) {
+                    setCurrentQuestion(prev => prev + 1);
+                } else {
+                    setQuizFinished(true);
+                    setQuizStats({
+                        total: quizStats.total + quizQuestions.length,
+                        correct: quizStats.correct + (isCorrect ? quizScore + 1 : quizScore)
+                    });
+                }
+            };
+
+            // คอมโพเนนต์หน้าแรก
+            const renderHome = () => (
+                <div className="flex flex-col items-center max-w-md mx-auto space-y-6">
+                    <div className="w-full flex justify-between items-center mb-4 border-b-2 border-green-200 pb-2">
+                        <div className="flex items-center gap-2">
+                            <span className="text-2xl font-bold cursor-pointer hover:bg-green-100 p-1 rounded" 
+                                  onClick={() => {
+                                      const newName = prompt("ตั้งชื่อสวนพฤกษศาสตร์ของคุณ:", gardenName);
+                                      if (newName) setGardenName(newName);
+                                  }}>
+                                🏡 {gardenName} ✏️
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="text-center bg-white p-6 rounded-2xl shadow-sm w-full relative overflow-hidden border border-green-100">
+                        <div className="absolute top-0 left-0 w-full h-full bg-blue-50 opacity-50 -z-10"></div>
+                        <p className="text-gray-600 italic mb-4">"ยินดีต้อนรับนักพฤกษศาสตร์! ท่องศัพท์เพื่อสะสมหยดน้ำ มารดต้นไม้กันเถอะ"</p>
+                        
+                        <h2 className="text-2xl font-bold text-green-800 mb-2">พืชปริศนา ☁️</h2>
+                        <div className="text-6xl my-6 relative">
+                            {xp >= 100 ? '🎁' : currentStage.icon}
+                            <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-24 h-4 bg-amber-900 rounded-[50%] opacity-80"></div>
+                        </div>
+                        <p className="text-lg font-semibold text-gray-700 mt-8 mb-2">ระยะ: {currentStage.name}</p>
+                        
+                        <div className="w-full bg-gray-200 rounded-full h-4 mb-2">
+                            <div className="bg-green-500 h-4 rounded-full transition-all duration-500" style={{ width: `${xp}%` }}></div>
+                        </div>
+                        <p className="text-sm text-gray-500 mb-4">{xp} / 100 XP</p>
+
+                        {xp < 100 ? (
+                            <button 
+                                onClick={handleWaterPlant}
+                                disabled={waterDrops < 10}
+                                className={`w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${
+                                    waterDrops >= 10 
+                                    ? 'bg-blue-400 hover:bg-blue-500 text-white shadow-md' 
+                                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                }`}
+                            >
+                                💧 รดน้ำต้นไม้ (ใช้ 10 หยด)
+                            </button>
+                        ) : (
+                            <button 
+                                onClick={handleHarvest}
+                                className="w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 shadow-md animate-bounce"
+                            >
+                                ✨ เก็บเกี่ยวเข้าคอลเลกชัน!
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 w-full">
+                        <div className="bg-white p-4 rounded-xl shadow-sm text-center border border-gray-100">
+                            <p className="text-sm text-gray-500">จำศัพท์ได้แล้ว</p>
+                            <p className="text-2xl font-bold text-green-600">{memorized.length}/{vocab.length}</p>
+                        </div>
+                        <div className="bg-white p-4 rounded-xl shadow-sm text-center border border-gray-100">
+                            <p className="text-sm text-gray-500">ความแม่นยำ Quiz</p>
+                            <p className="text-2xl font-bold text-blue-600">
+                                {quizStats.total > 0 ? Math.round((quizStats.correct / quizStats.total) * 100) : 0}%
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="flex gap-4 w-full">
+                        <button onClick={() => setView('flashcard')} className="flex-1 bg-white border-2 border-green-500 text-green-700 py-4 rounded-xl font-bold hover:bg-green-50 flex flex-col items-center gap-1 shadow-sm">
+                            <span className="text-2xl">📖</span>
+                            ท่องศัพท์<span className="text-xs font-normal text-gray-500">+5 💧/คำ</span>
+                        </button>
+                        <button onClick={startQuiz} className="flex-1 bg-white border-2 border-blue-500 text-blue-700 py-4 rounded-xl font-bold hover:bg-blue-50 flex flex-col items-center gap-1 shadow-sm">
+                            <span className="text-2xl">🎮</span>
+                            ทำแบบฝึกหัด<span className="text-xs font-normal text-gray-500">+10 💧/ข้อ</span>
+                        </button>
+                    </div>
+
+                    <button onClick={() => setView('collection')} className="w-full bg-yellow-50 text-yellow-700 py-3 rounded-xl font-semibold border border-yellow-200 flex justify-center items-center gap-2 hover:bg-yellow-100">
+                        🏆 ดูคอลเลกชันของฉัน ({collection.length} ต้น)
+                    </button>
+                </div>
+            );
+
+            // คอมโพเนนต์ Flashcard
+            const renderFlashcard = () => {
+                const actualIndex = Math.min(cardIndex, Math.max(0, filteredVocab.length - 1));
+                const currentCard = filteredVocab[actualIndex];
+                
+                if (!currentCard) return <div className="text-center p-8">ไม่มีคำศัพท์ในหมวดหมู่นี้</div>;
+
+                const isCardMemorized = memorized.includes(currentCard.id);
+
+                const toggleMode = () => {
+                    const modes = ['term', 'def', 'image'];
+                    const nextMode = modes[(modes.indexOf(flashcardMode) + 1) % modes.length];
+                    setFlashcardMode(nextMode);
+                    setIsFlipped(false);
+                };
+
+                return (
+                    <div className="flex flex-col items-center max-w-md mx-auto">
+                        <div className="w-full flex justify-between items-center mb-6">
+                            <button onClick={() => setView('home')} className="text-gray-500 hover:text-gray-800 text-xl">⬅️ กลับ</button>
+                            <select 
+                                className="bg-white border rounded p-2 shadow-sm"
+                                value={filter} 
+                                onChange={(e) => {
+                                    setFilter(e.target.value);
+                                    setCardIndex(0);
+                                    setIsFlipped(false);
+                                }}
+                            >
+                                {categories.map(c => <option key={c} value={c}>{c}</option>)}
+                            </select>
+                        </div>
+
+                        <div className="w-full flex justify-between items-center mb-2">
+                            <span className="text-sm text-gray-500">การ์ดที่ {actualIndex + 1} / {filteredVocab.length}</span>
+                            <button onClick={toggleMode} className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full flex items-center gap-1">
+                                🔄 โหมด: {flashcardMode === 'term' ? 'ถามศัพท์' : flashcardMode === 'def' ? 'ถามความหมาย' : 'ถามจากรูป'}
+                            </button>
+                        </div>
+
+                        <div 
+                            className="w-full h-80 bg-white rounded-2xl shadow-md flex items-center justify-center p-6 text-center cursor-pointer mb-6 border-2 border-transparent hover:border-green-200 transition-all relative"
+                            onClick={() => setIsFlipped(!isFlipped)}
+                        >
+                            {isCardMemorized && <div className="absolute top-2 right-2 bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full flex items-center gap-1">✅ จำได้แล้ว</div>}
+                            
+                            {!isFlipped ? (
+                                flashcardMode === 'term' ? (
+                                    <h2 className="text-3xl font-bold text-gray-800">{currentCard.term}</h2>
+                                ) : flashcardMode === 'image' ? (
+                                    currentCard.imageUrl ? <img src={currentCard.imageUrl} alt={currentCard.term} className="max-h-full max-w-full rounded" /> : <p className="text-gray-400">ไม่มีรูปภาพประกอบ</p>
+                                ) : (
+                                    <p className="text-lg text-gray-600">"{currentCard.def}"</p>
+                                )
+                            ) : (
+                                <div className="flex flex-col items-center gap-4">
+                                    <h2 className="text-2xl font-bold text-green-700">{currentCard.term}</h2>
+                                    <p className="text-md text-gray-700 border-t pt-4">"{currentCard.def}"</p>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex justify-between w-full gap-4">
+                            <button 
+                                onClick={() => { setCardIndex(prev => (prev - 1 + filteredVocab.length) % filteredVocab.length); setIsFlipped(false); }}
+                                className="flex-1 bg-white border border-gray-300 py-3 rounded-xl font-semibold hover:bg-gray-50"
+                            >
+                                ก่อนหน้า
+                            </button>
+                            {!isCardMemorized ? (
+                                <button 
+                                    onClick={() => markAsMemorized(currentCard.id)}
+                                    className="flex-1 bg-green-500 text-white py-3 rounded-xl font-bold shadow-md hover:bg-green-600 flex justify-center items-center gap-1"
+                                >
+                                    ✅ จำได้แล้ว (+5💧)
+                                </button>
+                            ) : (
+                                <button 
+                                    onClick={() => { setCardIndex(prev => (prev + 1) % filteredVocab.length); setIsFlipped(false); }}
+                                    className="flex-1 bg-blue-500 text-white py-3 rounded-xl font-bold shadow-md hover:bg-blue-600"
+                                >
+                                    ถัดไป ➡️
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                );
+            };
+
+            // คอมโพเนนต์ Quiz
+            const renderQuiz = () => {
+                if (quizFinished) {
+                    return (
+                        <div className="flex flex-col items-center max-w-md mx-auto text-center mt-10">
+                            <h2 className="text-3xl font-bold text-gray-800 mb-4">จบแบบฝึกหัด!</h2>
+                            <div className="text-6xl mb-4">🎯</div>
+                            <p className="text-xl mb-2">คุณตอบถูก <span className="font-bold text-green-600">{quizScore}</span> / 5 ข้อ</p>
+                            <p className="text-lg text-blue-600 font-bold mb-8">ได้รับ {quizScore * 10} 💧 หยดน้ำ</p>
+                            <div className="flex gap-4 w-full">
+                                <button onClick={() => setView('home')} className="flex-1 border-2 border-gray-300 py-3 rounded-xl font-bold hover:bg-gray-50">กลับหน้าหลัก</button>
+                                <button onClick={startQuiz} className="flex-1 bg-blue-500 text-white py-3 rounded-xl font-bold shadow-md hover:bg-blue-600">เล่นอีกครั้ง</button>
+                            </div>
+                        </div>
+                    );
+                }
+
+                const q = quizQuestions[currentQuestion];
+                return (
+                    <div className="flex flex-col items-center max-w-md mx-auto">
+                        <div className="w-full flex justify-between items-center mb-6">
+                            <button onClick={() => setView('home')} className="text-gray-500 hover:text-gray-800 text-xl">⬅️ ออก</button>
+                            <span className="font-bold text-blue-600">ข้อ {currentQuestion + 1}/5</span>
+                        </div>
+                        
+                        <div className="bg-white w-full p-6 rounded-2xl shadow-sm mb-6 text-center border border-gray-100">
+                            <p className="text-sm text-gray-500 mb-2">คำศัพท์คือ...</p>
+                            <h2 className="text-3xl font-bold text-gray-800">{q.vocab.term}</h2>
+                        </div>
+
+                        <div className="w-full space-y-3">
+                            {q.options.map((opt, idx) => (
+                                <button 
+                                    key={idx}
+                                    onClick={() => handleQuizAnswer(opt)}
+                                    className="w-full text-left bg-white border-2 border-blue-100 p-4 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-colors"
+                                >
+                                    {opt}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                );
+            };
+
+            // คอมโพเนนต์ Collection
+            const renderCollection = () => (
+                <div className="flex flex-col items-center max-w-md mx-auto">
+                    <div className="w-full flex items-center mb-6">
+                        <button onClick={() => setView('home')} className="text-gray-500 hover:text-gray-800 text-xl absolute">⬅️</button>
+                        <h2 className="text-2xl font-bold text-center w-full">🏡 {gardenName}</h2>
+                    </div>
+
+                    {collection.length === 0 ? (
+                        <div className="text-center mt-20 text-gray-400">
+                            <div className="text-6xl mb-4 opacity-50">🌱</div>
+                            <p>สวนของคุณยังว่างเปล่า<br/>ไปท่องศัพท์เพื่อปลูกต้นไม้กันเถอะ!</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-3 gap-4 w-full">
+                            {collection.map(plant => (
+                                <div key={plant.id} className="bg-white p-4 rounded-xl shadow-sm text-center flex flex-col items-center justify-center border border-green-100">
+                                    <span className="text-4xl mb-2">{plant.type}</span>
+                                    <span className="text-xs text-gray-400">{plant.date}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            );
+
+            return (
+                <div className="p-4 pt-8">
+                    {/* Header bar แสดงแต้มตลอดเวลา */}
+                    <div className="max-w-md mx-auto flex justify-end gap-3 mb-6">
+                        <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-bold flex items-center gap-1 shadow-sm">
+                            💧 {waterDrops}
+                        </div>
+                        <div className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full font-bold flex items-center gap-1 shadow-sm cursor-pointer" onClick={() => setView('collection')}>
+                            🏆 {collection.length}
+                        </div>
+                    </div>
+
+                    {view === 'home' && renderHome()}
+                    {view === 'flashcard' && renderFlashcard()}
+                    {view === 'quiz' && renderQuiz()}
+                    {view === 'collection' && renderCollection()}
+                </div>
+            );
+        };
+
+        // Render React App
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
