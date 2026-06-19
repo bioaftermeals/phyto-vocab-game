@@ -23,12 +23,12 @@
 <body class="bg-green-50 min-h-screen">
     <div id="root"></div>
 
-    <!-- ใช้ preset ที่เราตั้งค่าไว้ใหม่ และเอา data-type="module" ออก -->
+    <!-- ใช้ preset ที่เราตั้งค่าไว้ใหม่ -->
     <script type="text/babel" data-presets="react-classic">
         const { useState, useEffect, useMemo } = React;
 
         // ==========================================
-        // 📚 คลังคำศัพท์ของคุณครู (แก้ข้อมูลตรงนี้ได้เลย)
+        // 📚 คลังคำศัพท์ 19 คำ
         // ==========================================
         const INITIAL_VOCAB = [
             { id: 1, term: "Meristematic Tissue", def: "เนื้อเยื่อเจริญ เซลล์ยังมีชีวิต นิวเคลียสใหญ่ ผนังเซลล์บาง แบ่งเซลล์ได้ตลอดชีวิต", category: "General", imageUrl: "https://placehold.co/600x400/bbf7d0/166534?text=Meristematic" },
@@ -43,8 +43,13 @@
             { id: 10, term: "Xylem", def: "ไซเล็ม ท่อลำเลียงน้ำและแร่ธาตุ (ประกอบด้วย Tracheid, Vessel, Xylem parenchyma, Xylem fiber)", category: "Vascular", imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Xylem" },
             { id: 11, term: "Phloem", def: "โฟลเอ็ม ท่อลำเลียงอาหาร/น้ำตาล (ประกอบด้วย Sieve tube, Companion cell, Phloem parenchyma, Phloem fiber)", category: "Vascular", imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Phloem" },
             { id: 12, term: "Guard Cell", def: "เซลล์คุม เป็นเซลล์เอพิเดอร์มิสที่เปลี่ยนแปลงไปทำหน้าที่ควบคุมการเปิดปิดปากใบ (มีคลอโรพลาสต์)", category: "Permanent", imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Guard+Cell" },
-            { id: 13, term: "Sieve tube", def: "ท่อลำเลียงอาหารหลักใน Phloem ตอนโตเต็มที่จะไม่มีนิวเคลียส", category: "Vascular", imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Sieve+tube" },
-            { id: 14, term: "Companion cell", def: "เซลล์ประกบ อยู่ติดกับ Sieve tube คอยส่งพลังงานและควบคุมการทำงานให้ Sieve tube", category: "Vascular", imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Companion+cell" }
+            { id: 13, term: "Sieve tube member", def: "ท่อลำเลียงอาหารหลักใน Phloem ตอนโตเต็มที่จะไม่มีนิวเคลียส", category: "Vascular", imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Sieve+tube" },
+            { id: 14, term: "Companion cell", def: "เซลล์ประกบ อยู่ติดกับ Sieve tube คอยส่งพลังงานและควบคุมการทำงานให้ Sieve tube", category: "Vascular", imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Companion+cell" },
+            { id: 15, term: "Tracheid", def: "เซลล์ท่อลำเลียงน้ำ รูปร่างยาว ปลายแหลม มีรูพรุน (pit) ผนังเซลล์หนา", category: "Vascular", imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Tracheid" },
+            { id: 16, term: "Vessel member", def: "เซลล์ท่อลำเลียงน้ำ ท่อกว้าง ปลายเซลล์ทะลุถึงกันคล้ายท่อประปา ลำเลียงน้ำได้ดี", category: "Vascular", imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Vessel" },
+            { id: 17, term: "Endodermis", def: "ชั้นเซลล์ด้านในสุดของคอร์เทกซ์ในราก มีแถบแคสพาเรียน (Casparian strip) กั้นน้ำ", category: "Root", imageUrl: "https://placehold.co/600x400/fcd34d/b45309?text=Endodermis" },
+            { id: 18, term: "Pericycle", def: "เนื้อเยื่อชั้นนอกสุดของสตีลในราก สามารถแบ่งเซลล์เพื่อสร้างรากแขนงได้", category: "Root", imageUrl: "https://placehold.co/600x400/fcd34d/b45309?text=Pericycle" },
+            { id: 19, term: "Cork", def: "เซลล์ที่ตายแล้วอยู่รอบนอกสุดของลำต้น/รากที่แก่ มีซูเบอรินสะสม ป้องกันการสูญเสียน้ำ", category: "Permanent", imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Cork" }
         ];
 
         // ==========================================
@@ -70,13 +75,13 @@
             const [gardenName, setGardenName] = useState("สวนพฤกษศาสตร์ของฉัน");
             
             // หน้าต่าง UI
-            const [view, setView] = useState('home'); // home, flashcard, quiz, collection
+            const [view, setView] = useState('home'); 
             const [filter, setFilter] = useState('All');
             
             // Flashcard State
             const [cardIndex, setCardIndex] = useState(0);
             const [isFlipped, setIsFlipped] = useState(false);
-            const [flashcardMode, setFlashcardMode] = useState('term'); // term, def, image
+            const [flashcardMode, setFlashcardMode] = useState('term'); 
             
             // Quiz State
             const [quizQuestions, setQuizQuestions] = useState([]);
@@ -176,7 +181,6 @@
                 }
             };
 
-            // คอมโพเนนต์หน้าแรก
             const renderHome = () => (
                 <div className="flex flex-col items-center max-w-md mx-auto space-y-6">
                     <div className="w-full flex justify-between items-center mb-4 border-b-2 border-green-200 pb-2">
@@ -259,7 +263,6 @@
                 </div>
             );
 
-            // คอมโพเนนต์ Flashcard
             const renderFlashcard = () => {
                 const actualIndex = Math.min(cardIndex, Math.max(0, filteredVocab.length - 1));
                 const currentCard = filteredVocab[actualIndex];
@@ -348,7 +351,6 @@
                 );
             };
 
-            // คอมโพเนนต์ Quiz
             const renderQuiz = () => {
                 if (quizFinished) {
                     return (
@@ -393,7 +395,6 @@
                 );
             };
 
-            // คอมโพเนนต์ Collection
             const renderCollection = () => (
                 <div className="flex flex-col items-center max-w-md mx-auto">
                     <div className="w-full flex items-center mb-6">
@@ -421,7 +422,6 @@
 
             return (
                 <div className="p-4 pt-8">
-                    {/* Header bar แสดงแต้มตลอดเวลา */}
                     <div className="max-w-md mx-auto flex justify-end gap-3 mb-6">
                         <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-bold flex items-center gap-1 shadow-sm">
                             💧 {waterDrops}
@@ -439,7 +439,6 @@
             );
         };
 
-        // Render React App
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>
