@@ -28,35 +28,36 @@
         const { useState, useEffect, useMemo } = React;
 
         // ==========================================
-        // 📚 คลังคำศัพท์ 19 คำ
+        // 📚 คลังคำศัพท์ 19 คำ (รองรับหลายหมวดหมู่แล้ว)
+        // สังเกตตรง category จะใช้เครื่องหมาย [...] คั่นด้วยลูกน้ำ
         // ==========================================
         const INITIAL_VOCAB = [
-            { id: 1, term: "Meristematic Tissue", def: "เนื้อเยื่อเจริญ เซลล์ยังมีชีวิต นิวเคลียสใหญ่ ผนังเซลล์บาง แบ่งเซลล์ได้ตลอดชีวิต", category: "General", imageUrl: "https://placehold.co/600x400/bbf7d0/166534?text=Meristematic" },
-            { id: 2, term: "Apical Meristem", def: "เนื้อเยื่อเจริญส่วนปลาย (ปลายยอด/ปลายราก) ทำให้พืชยืดตัวยาวขึ้น (Primary growth)", category: "Meristem", imageUrl: "https://placehold.co/600x400/bbf7d0/166534?text=Apical+Meristem" },
-            { id: 3, term: "Lateral Meristem", def: "เนื้อเยื่อเจริญด้านข้าง (แคมเบียม) ทำให้พืชขยายออกด้านข้าง (Secondary growth)", category: "Meristem", imageUrl: "https://placehold.co/600x400/bbf7d0/166534?text=Lateral+Meristem" },
-            { id: 4, term: "Intercalary Meristem", def: "เนื้อเยื่อเจริญเหนือข้อ พบในพืชใบเลี้ยงเดี่ยว เช่น ไผ่ หญ้า ข้าว", category: "Meristem", imageUrl: "https://placehold.co/600x400/bbf7d0/166534?text=Intercalary" },
-            { id: 5, term: "Permanent Tissue", def: "เนื้อเยื่อถาวร เปลี่ยนแปลงมาจากเนื้อเยื่อเจริญ แบ่งเซลล์ไม่ได้แล้ว", category: "General", imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Permanent" },
-            { id: 6, term: "Epidermis", def: "เนื้อเยื่อผิว อยู่นอกสุด เซลล์เรียงชั้นเดียว ไม่มีคลอโรพลาสต์ (ยกเว้นเซลล์คุม)", category: "Permanent", imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Epidermis" },
-            { id: 7, term: "Parenchyma", def: "พาเรงคิมา เซลล์พื้นฐาน มีชีวิต ผนังเซลล์บาง มีช่องว่างระหว่างเซลล์ สะสมอาหารได้", category: "Permanent", imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Parenchyma" },
-            { id: 8, term: "Collenchyma", def: "คอลเลงคิมา ให้ความแข็งแรงแก่พืชอ่อน ผนังเซลล์หนาไม่เท่ากัน (หนาตามมุม)", category: "Permanent", imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Collenchyma" },
-            { id: 9, term: "Sclerenchyma", def: "สเคลอเรงคิมา เซลล์ตายแล้วตอนโตเต็มที่ ผนังเซลล์หนามาก (มีลิกนิน) ให้ความแข็งแรง", category: "Permanent", imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Sclerenchyma" },
-            { id: 10, term: "Xylem", def: "ไซเล็ม ท่อลำเลียงน้ำและแร่ธาตุ (ประกอบด้วย Tracheid, Vessel, Xylem parenchyma, Xylem fiber)", category: "Vascular", imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Xylem" },
-            { id: 11, term: "Phloem", def: "โฟลเอ็ม ท่อลำเลียงอาหาร/น้ำตาล (ประกอบด้วย Sieve tube, Companion cell, Phloem parenchyma, Phloem fiber)", category: "Vascular", imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Phloem" },
-            { id: 12, term: "Guard Cell", def: "เซลล์คุม เป็นเซลล์เอพิเดอร์มิสที่เปลี่ยนแปลงไปทำหน้าที่ควบคุมการเปิดปิดปากใบ (มีคลอโรพลาสต์)", category: "Permanent", imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Guard+Cell" },
-            { id: 13, term: "Sieve tube member", def: "ท่อลำเลียงอาหารหลักใน Phloem ตอนโตเต็มที่จะไม่มีนิวเคลียส", category: "Vascular", imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Sieve+tube" },
-            { id: 14, term: "Companion cell", def: "เซลล์ประกบ อยู่ติดกับ Sieve tube คอยส่งพลังงานและควบคุมการทำงานให้ Sieve tube", category: "Vascular", imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Companion+cell" },
-            { id: 15, term: "Tracheid", def: "เซลล์ท่อลำเลียงน้ำ รูปร่างยาว ปลายแหลม มีรูพรุน (pit) ผนังเซลล์หนา", category: "Vascular", imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Tracheid" },
-            { id: 16, term: "Vessel member", def: "เซลล์ท่อลำเลียงน้ำ ท่อกว้าง ปลายเซลล์ทะลุถึงกันคล้ายท่อประปา ลำเลียงน้ำได้ดี", category: "Vascular", imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Vessel" },
-            { id: 17, term: "Endodermis", def: "ชั้นเซลล์ด้านในสุดของคอร์เทกซ์ในราก มีแถบแคสพาเรียน (Casparian strip) กั้นน้ำ", category: "Root", imageUrl: "https://placehold.co/600x400/fcd34d/b45309?text=Endodermis" },
-            { id: 18, term: "Pericycle", def: "เนื้อเยื่อชั้นนอกสุดของสตีลในราก สามารถแบ่งเซลล์เพื่อสร้างรากแขนงได้", category: "Root", imageUrl: "https://placehold.co/600x400/fcd34d/b45309?text=Pericycle" },
-            { id: 19, term: "Cork", def: "เซลล์ที่ตายแล้วอยู่รอบนอกสุดของลำต้น/รากที่แก่ มีซูเบอรินสะสม ป้องกันการสูญเสียน้ำ", category: "Permanent", imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Cork" }
+            { id: 1, term: "Meristematic Tissue", def: "เซลล์ยังมีชีวิต นิวเคลียสใหญ่ ผนังเซลล์บาง แบ่งเซลล์ได้ตลอดชีวิต", category: ["General", "Meristem"], imageUrl: "https://placehold.co/600x400/bbf7d0/166534?text=Meristematic" },
+            { id: 2, term: "Apical Meristem", def: "พบที่ปลายยอด ปลายราก ทำให้พืชยืดตัวยาวขึ้น (Primary growth)", category: ["Meristem", "Primary Growth"], imageUrl: "https://placehold.co/600x400/bbf7d0/166534?text=Apical+Meristem" },
+            { id: 3, term: "Lateral Meristem", def: "ทำให้พืชขยายออกด้านข้าง (Secondary growth)", category: ["Meristem", "Secondary Growth"], imageUrl: "https://placehold.co/600x400/bbf7d0/166534?text=Lateral+Meristem" },
+            { id: 4, term: "Intercalary Meristem", def: "พบบริเวณเหนือข้อ พบในพืชใบเลี้ยงเดี่ยว เช่น ไผ่ หญ้า ข้าว", category: ["Meristem", "Primary Growth"], imageUrl: "https://placehold.co/600x400/bbf7d0/166534?text=Intercalary" },
+            { id: 5, term: "Permanent Tissue", def: "เปลี่ยนแปลงมาจากเนื้อเยื่อเจริญ แบ่งเซลล์ไม่ได้แล้ว", category: ["General", "Permanent"], imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Permanent" },
+            { id: 6, term: "Epidermis", def: "อยู่นอกสุด เซลล์เรียงชั้นเดียว ไม่มีคลอโรพลาสต์ (ยกเว้นเซลล์คุม) ปกป้องส่วนที่อยู่ด้านใน", category: ["Permanent", "Simple Tissue", "Dermal Tissue"], imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Epidermis" },
+            { id: 7, term: "Parenchyma", def: "เซลล์พื้นฐาน มีชีวิต ผนังเซลล์บาง มีช่องว่างระหว่างเซลล์ สะสมอาหารได้ บางชนิดสังเคราะห์ด้วยแสงได้", category: ["Permanent", "Simple Tissue", "Ground Tissue"], imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Parenchyma" },
+            { id: 8, term: "Collenchyma", def: "ให้ความแข็งแรงแก่พืช ช่วยเพิ่มความยืดหยุ่น ผนังเซลล์หนาไม่เท่ากัน (หนาตามมุม)", category: ["Permanent", "Simple Tissue", "Ground Tissue"], imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Collenchyma" },
+            { id: 9, term: "Sclerenchyma", def: "เซลล์ตายแล้วตอนโตเต็มที่ ผนังเซลล์หนามาก (มีลิกนิน) ให้ความแข็งแรง", category: ["Permanent", "Simple Tissue", "Ground Tissue"], imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Sclerenchyma" },
+            { id: 10, term: "Xylem", def: "ท่อลำเลียงน้ำและแร่ธาตุ ประกอบด้วย Tracheid, Vessel, Xylem parenchyma, Xylem fiber", category: ["Permanent", "Complex Tissue", "Vascular Tissue"], imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Xylem" },
+            { id: 11, term: "Phloem", def: "ท่อลำเลียงอาหาร(น้ำตาล) ประกอบด้วย Sieve tube, Companion cell, Phloem parenchyma, Phloem fiber", category: ["Permanent", "Complex Tissue", "Vascular Tissue"], imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Phloem" },
+            { id: 12, term: "Guard Cell", def: "เป็นเซลล์เอพิเดอร์มิสที่เปลี่ยนแปลงไปทำหน้าที่ควบคุมการเปิดปิดปากใบ (มีคลอโรพลาสต์)", category: ["Permanent", "Dermal Tissue"], imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Guard+Cell" },
+            { id: 13, term: "Sieve tube member", def: "ท่อลำเลียงอาหารหลักใน Phloem เป็นเซลล์ที่ยังมีชีวิต ตอนโตเต็มที่จะไม่มีนิวเคลียส", category: ["Vascular Tissue", "Phloem Components"], imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Sieve+tube" },
+            { id: 14, term: "Companion cell", def: "เซลล์อยู่ติดกับ Sieve tube คอยควบคุมการทำงานให้ Sieve tube", category: ["Vascular Tissue", "Phloem Components"], imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Companion+cell" },
+            { id: 15, term: "Tracheid", def: "เซลล์ท่อลำเลียงน้ำ รูปร่างยาว ปลายแหลม มีรูพรุน (pit) ผนังเซลล์หนา สะสมลิกนิน", category: ["Vascular Tissue", "Xylem Components"], imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Tracheid" },
+            { id: 16, term: "Vessel member", def: "เซลล์ท่อลำเลียงน้ำ ท่อกว้าง ปลายเซลล์ทะลุถึงกันคล้ายท่อประปา ลำเลียงน้ำได้ดี เป็นเซลล์ที่ตายแล้ว ผนังสะสมลิกนิน", category: ["Vascular Tissue", "Xylem Components"], imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Vessel" },
+            { id: 17, term: "Endodermis", def: "ชั้นเซลล์ด้านในสุดของคอร์เทกซ์ในราก มีแถบแคสพาเรียน (Casparian strip) กั้นน้ำ", category: ["Root Tissue"], imageUrl: "https://placehold.co/600x400/fcd34d/b45309?text=Endodermis" },
+            { id: 18, term: "Pericycle", def: "เนื้อเยื่อชั้นนอกสุดของสตีลในราก สามารถแบ่งเซลล์เพื่อสร้างรากแขนงได้", category: ["Root Tissue"], imageUrl: "https://placehold.co/600x400/fcd34d/b45309?text=Pericycle" },
+            { id: 19, term: "Cork", def: "เซลล์ที่ตายแล้วอยู่รอบนอกสุดของลำต้น/รากที่แก่ มีซูเบอรินสะสม ป้องกันการสูญเสียน้ำ", category: ["Permanent", "Dermal Tissue", "Secondary Growth"], imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Cork" }
         ];
 
         // ==========================================
         // ระบบโค้ดแอปพลิเคชัน (ไม่ต้องแก้)
         // ==========================================
         const PLANT_STAGES = [
-            { threshold: 0, name: 'เมล็ดพันธุ์', icon: '🌱' },
+            { threshold: 0, name: 'เมล็ดพันธุ์', icon: '🌰' },
             { threshold: 30, name: 'ต้นกล้า', icon: '🌿' },
             { threshold: 70, name: 'ต้นไม้', icon: '🌳' },
             { threshold: 100, name: 'โตเต็มวัย!', icon: '✨' }
@@ -115,8 +116,20 @@
                 return [...PLANT_STAGES].reverse().find(stage => xp >= stage.threshold) || PLANT_STAGES[0];
             }, [xp]);
 
-            const categories = ['All', ...new Set(vocab.map(v => v.category))];
-            const filteredVocab = filter === 'All' ? vocab : vocab.filter(v => v.category === filter);
+            // ✅ สร้างรายการหมวดหมู่แบบดึงจาก Array ที่ซ้อนกันอยู่
+            const categories = useMemo(() => {
+                const allCategories = vocab.flatMap(v => Array.isArray(v.category) ? v.category : [v.category]);
+                return ['All', ...new Set(allCategories)];
+            }, [vocab]);
+
+            // ✅ คัดกรองคำศัพท์โดยเช็คว่ามีหมวดหมู่นั้นอยู่ใน Array หรือไม่
+            const filteredVocab = useMemo(() => {
+                if (filter === 'All') return vocab;
+                return vocab.filter(v => {
+                    if (Array.isArray(v.category)) return v.category.includes(filter);
+                    return v.category === filter;
+                });
+            }, [vocab, filter]);
 
             const handleWaterPlant = () => {
                 if (waterDrops >= 10 && xp < 100) {
@@ -310,7 +323,15 @@
                             
                             {!isFlipped ? (
                                 flashcardMode === 'term' ? (
-                                    <h2 className="text-3xl font-bold text-gray-800">{currentCard.term}</h2>
+                                    <div className="flex flex-col items-center">
+                                        <h2 className="text-3xl font-bold text-gray-800">{currentCard.term}</h2>
+                                        {/* แสดงป้ายหมวดหมู่ให้เห็นว่าอยู่หลายหมวด */}
+                                        <div className="flex flex-wrap gap-1 justify-center mt-3">
+                                            {(Array.isArray(currentCard.category) ? currentCard.category : [currentCard.category]).map((c, i) => (
+                                                <span key={i} className="text-[10px] bg-green-50 text-green-600 px-2 py-1 rounded-full border border-green-100">{c}</span>
+                                            ))}
+                                        </div>
+                                    </div>
                                 ) : flashcardMode === 'image' ? (
                                     currentCard.imageUrl ? <img src={currentCard.imageUrl} alt={currentCard.term} className="max-h-full max-w-full rounded" /> : <p className="text-gray-400">ไม่มีรูปภาพประกอบ</p>
                                 ) : (
