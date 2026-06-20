@@ -44,7 +44,7 @@
         const { useState, useEffect, useMemo } = React;
 
         // ==========================================
-        // 📚 คลังคำศัพท์ 20 คำ (อัปเดตความหมายใหม่ + ลบรูป Meristem)
+        // 📚 คลังคำศัพท์ (อัปเดตความหมายใหม่ + ลบรูป Meristem + แก้ไขเครื่องหมายลูกน้ำตกหล่น)
         // ==========================================
         const INITIAL_VOCAB = [
             { 
@@ -108,7 +108,7 @@
                 category: ["Meristem", "Vascular Tissue", "Secondary Growth"], 
                 imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Vascular+Cambium",
                 conflicts: [3] // <--- ห้ามเอา Lateral Meristem มาหลอก เพราะ Vascular cambium ก็คือ Lateral Meristem ชนิดหนึ่ง
-            }
+            }, // ✅ เพิ่มลูกน้ำ (Comma) ตรงนี้แล้วครับ
             { 
                 id: 21, 
                 term: "Cork cambium", 
@@ -247,22 +247,15 @@
                 }
             };
 
-            // ✅ ฟังก์ชันสุ่มข้อสอบแบบฉลาด (ป้องกันตัวลวงซับเซต)
             const startQuiz = () => {
                 const shuffled = [...vocab].sort(() => 0.5 - Math.random()).slice(0, 5);
                 const questions = shuffled.map(v => {
                     const wrongOptions = vocab
                         .filter(opt => {
-                            // 1. ห้ามเป็นข้อที่ถูก
                             if (opt.id === v.id) return false;
-                            
-                            // 2. เช็คว่าเป็นข้อที่อยู่ในหมวดหมู่ซับเซตต้องห้ามหรือไม่
                             const vConflicts = v.conflicts || [];
                             const optConflicts = opt.conflicts || [];
-                            
-                            // ถ้าฝั่งคำถามห้ามช้อยส์นี้ หรือ ฝั่งช้อยส์ห้ามคำถามนี้ ให้เตะออก
                             if (vConflicts.includes(opt.id) || optConflicts.includes(v.id)) return false;
-                            
                             return true;
                         })
                         .sort(() => 0.5 - Math.random())
