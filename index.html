@@ -4,14 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phyto! ภารกิจงอกศัพท์</title>
-    <!-- โหลด Tailwind CSS สำหรับตกแต่งสีสัน -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- โหลด React และ Babel สำหรับให้ระบบแอปทำงานได้ในไฟล์เดียว -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
-    <!-- ตั้งค่า Babel ให้ใช้ Classic Runtime ป้องกัน Error react/jsx-runtime -->
     <script>
         Babel.registerPreset('react-classic', {
             presets: [
@@ -23,10 +20,9 @@
 <body class="bg-green-50 min-h-screen">
     <div id="root"></div>
 
-    <!-- ใช้ preset ที่เราตั้งค่าไว้ใหม่ -->
     <script type="text/babel" data-presets="react-classic">
         const { useState, useEffect, useMemo } = React;
-
+        
         // ==========================================
         // 📚 คลังคำศัพท์ 19 คำ (รองรับหลายหมวดหมู่แล้ว)
         // สังเกตตรง category จะใช้เครื่องหมาย [...] คั่นด้วยลูกน้ำ
@@ -50,20 +46,44 @@
             { id: 16, term: "Vessel member", def: "เซลล์ท่อลำเลียงน้ำ ท่อกว้าง ปลายเซลล์ทะลุถึงกันคล้ายท่อประปา ลำเลียงน้ำได้ดี เป็นเซลล์ที่ตายแล้ว ผนังสะสมลิกนิน", category: ["Vascular Tissue", "Xylem Components"], imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Vessel" },
             { id: 17, term: "Endodermis", def: "ชั้นเซลล์ด้านในสุดของคอร์เทกซ์ในราก มีแถบแคสพาเรียน (Casparian strip) กั้นน้ำ", category: ["Root Tissue"], imageUrl: "https://placehold.co/600x400/fcd34d/b45309?text=Endodermis" },
             { id: 18, term: "Pericycle", def: "เนื้อเยื่อชั้นนอกสุดของสตีลในราก สามารถแบ่งเซลล์เพื่อสร้างรากแขนงได้", category: ["Root Tissue"], imageUrl: "https://placehold.co/600x400/fcd34d/b45309?text=Pericycle" },
-            { id: 19, term: "Cork", def: "เซลล์ที่ตายแล้วอยู่รอบนอกสุดของลำต้น/รากที่แก่ มีซูเบอรินสะสม ป้องกันการสูญเสียน้ำ", category: ["Permanent", "Dermal Tissue", "Secondary Growth"], imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Cork" }
+            { id: 18, term: "Pericycle", def: "เนื้อเยื่อชั้นนอกสุดของสตีลในราก สามารถแบ่งเซลล์เพื่อสร้างรากแขนงได้", category: ["Root Tissue"], imageUrl: "https://placehold.co/600x400/fcd34d/b45309?text=Pericycle" },
+            { id: 19, term: "Cork", def: "เซลล์ที่ตายแล้วอยู่รอบนอกสุดของลำต้น/รากที่แก่ มีซูเบอรินสะสม ป้องกันการสูญเสียน้ำ", category: ["Permanent", "Dermal Tissue", "Secondary Growth"], imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Cork" },
+            { id: 20, term: "Vascular cambium", def: "เนื้อเยื่อที่ยังมีชีวิต แบ่งเซลล์เพื่อสร้างไซเล็มทุติยภูมิ (secondary xylem) และโฟลเอ็มทุติยภูมิ (secondary phloem)", category: ["Meristem", "vascular Tissue", "Secondary Growth"], imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Cork" }
         ];
-
+        
         // ==========================================
-        // ระบบโค้ดแอปพลิเคชัน (ไม่ต้องแก้)
+        // ระบบโค้ดแอปพลิเคชัน
         // ==========================================
         const PLANT_STAGES = [
             { threshold: 0, name: 'เมล็ดพันธุ์', icon: '🌰' },
-            { threshold: 30, name: 'ต้นกล้า', icon: '🌿' },
+            { threshold: 30, name: 'ต้นกล้า', icon: '🌱' },
             { threshold: 70, name: 'ต้นไม้', icon: '🌳' },
             { threshold: 100, name: 'โตเต็มวัย!', icon: '✨' }
         ];
 
-        const PLANT_RESULTS = ['🌲', '🌴', '🌵', '🌻', '🌷', '🍄', '🍀'];
+        // ✅ อัปเดตรายการพืชให้มี "ชื่อเริ่มต้น"
+        const PLANT_RESULTS = [
+            { icon: '🌲', name: 'สนป่า' },
+            { icon: '🌴', name: 'ปาล์ม' },
+            { icon: '🌵', name: 'กระบองเพชร' },
+            { icon: '🌻', name: 'ทานตะวัน' },
+            { icon: '🌷', name: 'ทิวลิป' },
+            { icon: '🍄', name: 'เห็ดจิ๋ว' },
+            { icon: '🍀', name: 'โคลเวอร์' }
+        ];
+
+        // ✅ ข้อความให้กำลังใจที่จะสุ่มโชว์บนหัวต้นไม้
+        const ENCOURAGING_MESSAGES = [
+            "ไฟต์โตะ! สู้เขานะ!",
+            "เก่งมากเลย!",
+            "เติบโตไปด้วยกันนะ 🌱",
+            "พยายามได้ดีมาก!",
+            "ฟาร์มความรู้ของเราค่อยๆ โตแล้วนะ 🏡",
+            "วันนี้ก็ยอดเยี่ยมเหมือนเดิม!",
+            "ค่อยๆ สะสมความรู้ทีละนิดนะ",
+            "ภูมิใจในตัวเธอจัง!",
+            "สุดยอดไปเลย นักพฤกษศาสตร์น้อย!"
+        ];
 
         const App = () => {
             // State ทั้งหมด
@@ -116,13 +136,11 @@
                 return [...PLANT_STAGES].reverse().find(stage => xp >= stage.threshold) || PLANT_STAGES[0];
             }, [xp]);
 
-            // ✅ สร้างรายการหมวดหมู่แบบดึงจาก Array ที่ซ้อนกันอยู่
             const categories = useMemo(() => {
                 const allCategories = vocab.flatMap(v => Array.isArray(v.category) ? v.category : [v.category]);
                 return ['All', ...new Set(allCategories)];
             }, [vocab]);
 
-            // ✅ คัดกรองคำศัพท์โดยเช็คว่ามีหมวดหมู่นั้นอยู่ใน Array หรือไม่
             const filteredVocab = useMemo(() => {
                 if (filter === 'All') return vocab;
                 return vocab.filter(v => {
@@ -141,7 +159,12 @@
             const handleHarvest = () => {
                 if (xp >= 100) {
                     const randomPlant = PLANT_RESULTS[Math.floor(Math.random() * PLANT_RESULTS.length)];
-                    setCollection([...collection, { id: Date.now(), type: randomPlant, date: new Date().toLocaleDateString() }]);
+                    setCollection(prev => [...prev, { 
+                        id: Date.now(), 
+                        type: randomPlant.icon, 
+                        name: randomPlant.name, // บันทึกชื่อเริ่มต้นของพืช
+                        date: new Date().toLocaleDateString() 
+                    }]);
                     setXp(0);
                     setView('collection');
                 }
@@ -149,11 +172,21 @@
 
             const markAsMemorized = (id) => {
                 if (!memorized.includes(id)) {
-                    setMemorized([...memorized, id]);
+                    setMemorized(prev => [...prev, id]);
                     setWaterDrops(prev => prev + 5);
                 }
                 setIsFlipped(false);
                 setCardIndex(prev => (prev + 1) % filteredVocab.length);
+            };
+
+            // ✅ ฟังก์ชันสำหรับเปลี่ยนชื่อต้นไม้ในคอลเลกชัน
+            const renamePlant = (id, currentName) => {
+                const newName = prompt("ตั้งชื่อให้ต้นไม้ของคุณ:", currentName);
+                if (newName !== null && newName.trim() !== "") {
+                    setCollection(prev => prev.map(plant => 
+                        plant.id === id ? { ...plant, name: newName.trim() } : plant
+                    ));
+                }
             };
 
             const startQuiz = () => {
@@ -325,7 +358,6 @@
                                 flashcardMode === 'term' ? (
                                     <div className="flex flex-col items-center">
                                         <h2 className="text-3xl font-bold text-gray-800">{currentCard.term}</h2>
-                                        {/* แสดงป้ายหมวดหมู่ให้เห็นว่าอยู่หลายหมวด */}
                                         <div className="flex flex-wrap gap-1 justify-center mt-3">
                                             {(Array.isArray(currentCard.category) ? currentCard.category : [currentCard.category]).map((c, i) => (
                                                 <span key={i} className="text-[10px] bg-green-50 text-green-600 px-2 py-1 rounded-full border border-green-100">{c}</span>
@@ -417,7 +449,7 @@
             };
 
             const renderCollection = () => (
-                <div className="flex flex-col items-center max-w-md mx-auto">
+                <div className="flex flex-col items-center max-w-md mx-auto pb-10">
                     <div className="w-full flex items-center mb-6">
                         <button onClick={() => setView('home')} className="text-gray-500 hover:text-gray-800 text-xl absolute">⬅️</button>
                         <h2 className="text-2xl font-bold text-center w-full">🏡 {gardenName}</h2>
@@ -429,33 +461,70 @@
                             <p>สวนของคุณยังว่างเปล่า<br/>ไปท่องศัพท์เพื่อปลูกต้นไม้กันเถอะ!</p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-3 gap-4 w-full">
-                            {collection.map(plant => (
-                                <div key={plant.id} className="bg-white p-4 rounded-xl shadow-sm text-center flex flex-col items-center justify-center border border-green-100">
-                                    <span className="text-4xl mb-2">{plant.type}</span>
-                                    <span className="text-xs text-gray-400">{plant.date}</span>
-                                </div>
-                            ))}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-12 gap-x-4 w-full mt-6">
+                            {collection.map(plant => {
+                                // ดึงข้อความให้กำลังใจโดยใช้ id เป็นตัวกำหนด เพื่อให้ข้อความไม่เปลี่ยนไปมาตอนรีเฟรช
+                                const messageIndex = plant.id % ENCOURAGING_MESSAGES.length;
+                                const message = ENCOURAGING_MESSAGES[messageIndex];
+                                
+                                // ป้องกัน Error กรณีต้นไม้เก่าที่ไม่มีชื่อบันทึกไว้
+                                const defaultName = PLANT_RESULTS.find(p => p.icon === plant.type)?.name || "พืชปริศนา";
+                                const displayName = plant.name || defaultName;
+
+                                return (
+                                    <div key={plant.id} className="bg-white p-4 rounded-xl shadow-sm text-center flex flex-col items-center justify-center border border-green-100 relative">
+                                        
+                                        {/* 💬 กล่องบับเบิ้ลข้อความ */}
+                                        <div className="absolute -top-10 bg-blue-50 text-blue-600 text-[10px] px-2 py-1 rounded-xl border border-blue-100 shadow-sm whitespace-nowrap animate-bounce z-10">
+                                            {message}
+                                            <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-blue-50 border-b border-r border-blue-100 rotate-45"></div>
+                                        </div>
+
+                                        <span className="text-5xl mb-3 mt-2">{plant.type}</span>
+                                        
+                                        {/* ✏️ กล่องชื่อต้นไม้พร้อมปุ่มแก้ไข */}
+                                        <div className="flex items-center justify-center gap-1 mb-1 bg-green-50 px-2 py-1 rounded-md w-full">
+                                            <span className="font-bold text-xs text-gray-700 truncate">{displayName}</span>
+                                            <button 
+                                                onClick={() => renamePlant(plant.id, displayName)} 
+                                                className="text-gray-400 hover:text-green-600 text-xs ml-1"
+                                                title="เปลี่ยนชื่อต้นไม้"
+                                            >
+                                                ✏️
+                                            </button>
+                                        </div>
+                                        
+                                        <span className="text-[10px] text-gray-400">{plant.date}</span>
+                                    </div>
+                                );
+                            })}
                         </div>
                     )}
                 </div>
             );
 
             return (
-                <div className="p-4 pt-8">
-                    <div className="max-w-md mx-auto flex justify-end gap-3 mb-6">
-                        <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-bold flex items-center gap-1 shadow-sm">
-                            💧 {waterDrops}
+                <div className="p-4 pt-8 min-h-[95vh] flex flex-col">
+                    <div className="flex-grow">
+                        <div className="max-w-md mx-auto flex justify-end gap-3 mb-6">
+                            <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-bold flex items-center gap-1 shadow-sm">
+                                💧 {waterDrops}
+                            </div>
+                            <div className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full font-bold flex items-center gap-1 shadow-sm cursor-pointer" onClick={() => setView('collection')}>
+                                🏆 {collection.length}
+                            </div>
                         </div>
-                        <div className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full font-bold flex items-center gap-1 shadow-sm cursor-pointer" onClick={() => setView('collection')}>
-                            🏆 {collection.length}
-                        </div>
-                    </div>
 
-                    {view === 'home' && renderHome()}
-                    {view === 'flashcard' && renderFlashcard()}
-                    {view === 'quiz' && renderQuiz()}
-                    {view === 'collection' && renderCollection()}
+                        {view === 'home' && renderHome()}
+                        {view === 'flashcard' && renderFlashcard()}
+                        {view === 'quiz' && renderQuiz()}
+                        {view === 'collection' && renderCollection()}
+                    </div>
+                    
+                    {/* ✅ Footer ลิขสิทธิ์ */}
+                    <div className="mt-10 text-center text-xs font-medium text-green-700/60 pb-2">
+                        &copy; ลิขสิทธิ์ของ Bio after meals (พัฒนาโดยพรธรรมมิก นามแดง)
+                    </div>
                 </div>
             );
         };
