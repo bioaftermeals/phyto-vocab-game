@@ -4,7 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phyto! ภารกิจงอกศัพท์</title>
+    
+    <!-- ✅ เพิ่มการเรียกใช้ Font Sarabun จาก Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- ✅ ตั้งค่าให้เรียกใช้ Sarabun เฉพาะจุดที่ระบุ (ไม่กระทบทั้งเว็บ) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sarabun: ['Sarabun', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -17,28 +37,62 @@
         });
     </script>
 </head>
-<body class="bg-green-50 min-h-screen">
-    <div id="root"></div>
+<body class="bg-green-50 min-h-screen flex flex-col">
+    <div id="root" class="flex-grow"></div>
 
     <script type="text/babel" data-presets="react-classic">
         const { useState, useEffect, useMemo } = React;
-        
+
         // ==========================================
-        // 📚 คลังคำศัพท์ 19 คำ (รองรับหลายหมวดหมู่แล้ว)
-        // สังเกตตรง category จะใช้เครื่องหมาย [...] คั่นด้วยลูกน้ำ
+        // 📚 คลังคำศัพท์ 20 คำ (อัปเดตความหมายใหม่ + ลบรูป Meristem)
         // ==========================================
         const INITIAL_VOCAB = [
-            { id: 1, term: "Meristematic Tissue", def: "เซลล์ยังมีชีวิต นิวเคลียสใหญ่ ผนังเซลล์บาง แบ่งเซลล์ได้ตลอดชีวิต", category: ["General", "Meristem"], imageUrl: "https://placehold.co/600x400/bbf7d0/166534?text=Meristematic" },
+            { 
+                id: 1, 
+                term: "Meristematic Tissue", 
+                def: "เซลล์ยังมีชีวิต นิวเคลียสใหญ่ ผนังเซลล์บาง แบ่งเซลล์ได้ตลอดชีวิต", 
+                category: ["General", "Meristem"], 
+                imageUrl: "", // เอาออกแบบที่ครูบอกครับ เพื่อไม่ให้สับสนกับชนิดย่อย
+                conflicts: [2, 3, 4, 20, 21] // <--- ห้ามเอาเนื้อเยื่อเจริญย่อยมาเป็นช้อยส์หลอก
+            },
             { id: 2, term: "Apical Meristem", def: "พบที่ปลายยอด ปลายราก ทำให้พืชยืดตัวยาวขึ้น (Primary growth)", category: ["Meristem", "Primary Growth"], imageUrl: "https://placehold.co/600x400/bbf7d0/166534?text=Apical+Meristem" },
-            { id: 3, term: "Lateral Meristem", def: "ทำให้พืชขยายออกด้านข้าง (Secondary growth)", category: ["Meristem", "Secondary Growth"], imageUrl: "https://placehold.co/600x400/bbf7d0/166534?text=Lateral+Meristem" },
-            { id: 4, term: "Intercalary Meristem", def: "พบบริเวณเหนือข้อ พบในพืชใบเลี้ยงเดี่ยว เช่น ไผ่ หญ้า ข้าว", category: ["Meristem", "Primary Growth"], imageUrl: "https://placehold.co/600x400/bbf7d0/166534?text=Intercalary" },
-            { id: 5, term: "Permanent Tissue", def: "เปลี่ยนแปลงมาจากเนื้อเยื่อเจริญ แบ่งเซลล์ไม่ได้แล้ว", category: ["General", "Permanent"], imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Permanent" },
-            { id: 6, term: "Epidermis", def: "อยู่นอกสุด เซลล์เรียงชั้นเดียว ไม่มีคลอโรพลาสต์ (ยกเว้นเซลล์คุม) ปกป้องส่วนที่อยู่ด้านใน", category: ["Permanent", "Simple Tissue", "Dermal Tissue"], imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Epidermis" },
+            { 
+                id: 3, 
+                term: "Lateral Meristem", 
+                def: "ทำให้พืชขยายออกด้านข้าง (Secondary growth)", 
+                category: ["Meristem", "Secondary Growth"], 
+                imageUrl: "",
+                conflicts: [20, 21] // <--- ห้ามเอา Vascular cambium มาเป็นช้อยส์หลอก
+            },
+            { id: 4, term: "Intercalary Meristem", def: "พบบริเวณเหนือข้อ พบในพืชใบเลี้ยงเดี่ยว เช่น ไผ่ หญ้า ข้าว", category: ["Meristem", "Primary Growth"], imageUrl: "" },
+            { id: 5, term: "Permanent Tissue", def: "เปลี่ยนแปลงมาจากเนื้อเยื่อเจริญ แบ่งเซลล์ไม่ได้แล้ว", category: ["General", "Permanent"], imageUrl: "" },
+            { 
+                id: 6, 
+                term: "Epidermis", 
+                def: "อยู่นอกสุด เซลล์เรียงชั้นเดียว ไม่มีคลอโรพลาสต์ (ยกเว้นเซลล์คุม) ปกป้องส่วนที่อยู่ด้านใน", 
+                category: ["Permanent", "Simple Tissue", "Dermal Tissue"], 
+                imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Epidermis",
+                conflicts: [12] // <--- ห้ามเอา Guard cell มาหลอกเพราะเป็น Epidermis ที่เปลี่ยนรูป
+            },
             { id: 7, term: "Parenchyma", def: "เซลล์พื้นฐาน มีชีวิต ผนังเซลล์บาง มีช่องว่างระหว่างเซลล์ สะสมอาหารได้ บางชนิดสังเคราะห์ด้วยแสงได้", category: ["Permanent", "Simple Tissue", "Ground Tissue"], imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Parenchyma" },
             { id: 8, term: "Collenchyma", def: "ให้ความแข็งแรงแก่พืช ช่วยเพิ่มความยืดหยุ่น ผนังเซลล์หนาไม่เท่ากัน (หนาตามมุม)", category: ["Permanent", "Simple Tissue", "Ground Tissue"], imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Collenchyma" },
             { id: 9, term: "Sclerenchyma", def: "เซลล์ตายแล้วตอนโตเต็มที่ ผนังเซลล์หนามาก (มีลิกนิน) ให้ความแข็งแรง", category: ["Permanent", "Simple Tissue", "Ground Tissue"], imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Sclerenchyma" },
-            { id: 10, term: "Xylem", def: "ท่อลำเลียงน้ำและแร่ธาตุ ประกอบด้วย Tracheid, Vessel, Xylem parenchyma, Xylem fiber", category: ["Permanent", "Complex Tissue", "Vascular Tissue"], imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Xylem" },
-            { id: 11, term: "Phloem", def: "ท่อลำเลียงอาหาร(น้ำตาล) ประกอบด้วย Sieve tube, Companion cell, Phloem parenchyma, Phloem fiber", category: ["Permanent", "Complex Tissue", "Vascular Tissue"], imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Phloem" },
+            { 
+                id: 10, 
+                term: "Xylem", 
+                def: "ท่อลำเลียงน้ำและแร่ธาตุ ประกอบด้วย Tracheid, Vessel, Xylem parenchyma, Xylem fiber", 
+                category: ["Permanent", "Complex Tissue", "Vascular Tissue"], 
+                imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Xylem",
+                conflicts: [15, 16] // <--- ห้ามเอาองค์ประกอบย่อยมาหลอก
+            },
+            { 
+                id: 11, 
+                term: "Phloem", 
+                def: "ท่อลำเลียงอาหาร(น้ำตาล) ประกอบด้วย Sieve tube, Companion cell, Phloem parenchyma, Phloem fiber", 
+                category: ["Permanent", "Complex Tissue", "Vascular Tissue"], 
+                imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Phloem",
+                conflicts: [13, 14] // <--- ห้ามเอาองค์ประกอบย่อยมาหลอก
+            },
             { id: 12, term: "Guard Cell", def: "เป็นเซลล์เอพิเดอร์มิสที่เปลี่ยนแปลงไปทำหน้าที่ควบคุมการเปิดปิดปากใบ (มีคลอโรพลาสต์)", category: ["Permanent", "Dermal Tissue"], imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Guard+Cell" },
             { id: 13, term: "Sieve tube member", def: "ท่อลำเลียงอาหารหลักใน Phloem เป็นเซลล์ที่ยังมีชีวิต ตอนโตเต็มที่จะไม่มีนิวเคลียส", category: ["Vascular Tissue", "Phloem Components"], imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Sieve+tube" },
             { id: 14, term: "Companion cell", def: "เซลล์อยู่ติดกับ Sieve tube คอยควบคุมการทำงานให้ Sieve tube", category: ["Vascular Tissue", "Phloem Components"], imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Companion+cell" },
@@ -46,22 +100,35 @@
             { id: 16, term: "Vessel member", def: "เซลล์ท่อลำเลียงน้ำ ท่อกว้าง ปลายเซลล์ทะลุถึงกันคล้ายท่อประปา ลำเลียงน้ำได้ดี เป็นเซลล์ที่ตายแล้ว ผนังสะสมลิกนิน", category: ["Vascular Tissue", "Xylem Components"], imageUrl: "https://placehold.co/600x400/bfdbfe/1e3a8a?text=Vessel" },
             { id: 17, term: "Endodermis", def: "ชั้นเซลล์ด้านในสุดของคอร์เทกซ์ในราก มีแถบแคสพาเรียน (Casparian strip) กั้นน้ำ", category: ["Root Tissue"], imageUrl: "https://placehold.co/600x400/fcd34d/b45309?text=Endodermis" },
             { id: 18, term: "Pericycle", def: "เนื้อเยื่อชั้นนอกสุดของสตีลในราก สามารถแบ่งเซลล์เพื่อสร้างรากแขนงได้", category: ["Root Tissue"], imageUrl: "https://placehold.co/600x400/fcd34d/b45309?text=Pericycle" },
-            { id: 18, term: "Pericycle", def: "เนื้อเยื่อชั้นนอกสุดของสตีลในราก สามารถแบ่งเซลล์เพื่อสร้างรากแขนงได้", category: ["Root Tissue"], imageUrl: "https://placehold.co/600x400/fcd34d/b45309?text=Pericycle" },
             { id: 19, term: "Cork", def: "เซลล์ที่ตายแล้วอยู่รอบนอกสุดของลำต้น/รากที่แก่ มีซูเบอรินสะสม ป้องกันการสูญเสียน้ำ", category: ["Permanent", "Dermal Tissue", "Secondary Growth"], imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Cork" },
-            { id: 20, term: "Vascular cambium", def: "เนื้อเยื่อที่ยังมีชีวิต แบ่งเซลล์เพื่อสร้างไซเล็มทุติยภูมิ (secondary xylem) และโฟลเอ็มทุติยภูมิ (secondary phloem)", category: ["Meristem", "vascular Tissue", "Secondary Growth"], imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Cork" }
+            { 
+                id: 20, 
+                term: "Vascular cambium", 
+                def: "เนื้อเยื่อที่ยังมีชีวิต แบ่งเซลล์เพื่อสร้างไซเล็มทุติยภูมิ (secondary xylem) และโฟลเอ็มทุติยภูมิ (secondary phloem)", 
+                category: ["Meristem", "Vascular Tissue", "Secondary Growth"], 
+                imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Vascular+Cambium",
+                conflicts: [3] // <--- ห้ามเอา Lateral Meristem มาหลอก เพราะ Vascular cambium ก็คือ Lateral Meristem ชนิดหนึ่ง
+            }
+            { 
+                id: 21, 
+                term: "Cork cambium", 
+                def: "เนื้อเยื่อที่ยังมีชีวิต แบ่งเซลล์เพื่อสร้างคอร์ก (cork) และเฟลโลเดิร์ม (phelloderm)", 
+                category: ["Meristem", "Dermal Tissue", "Secondary Growth"], 
+                imageUrl: "https://placehold.co/600x400/fef08a/854d0e?text=Vascular+Cambium",
+                conflicts: [3] // <--- ห้ามเอา Lateral Meristem มาหลอก เพราะ Vascular cambium ก็คือ Lateral Meristem ชนิดหนึ่ง
+            }
         ];
-        
+
         // ==========================================
         // ระบบโค้ดแอปพลิเคชัน
         // ==========================================
         const PLANT_STAGES = [
-            { threshold: 0, name: 'เมล็ดพันธุ์', icon: '🌰' },
-            { threshold: 30, name: 'ต้นกล้า', icon: '🌱' },
+            { threshold: 0, name: 'เมล็ดพันธุ์', icon: '🌱' },
+            { threshold: 30, name: 'ต้นกล้า', icon: '🌿' },
             { threshold: 70, name: 'ต้นไม้', icon: '🌳' },
             { threshold: 100, name: 'โตเต็มวัย!', icon: '✨' }
         ];
 
-        // ✅ อัปเดตรายการพืชให้มี "ชื่อเริ่มต้น"
         const PLANT_RESULTS = [
             { icon: '🌲', name: 'สนป่า' },
             { icon: '🌴', name: 'ปาล์ม' },
@@ -72,9 +139,8 @@
             { icon: '🍀', name: 'โคลเวอร์' }
         ];
 
-        // ✅ ข้อความให้กำลังใจที่จะสุ่มโชว์บนหัวต้นไม้
         const ENCOURAGING_MESSAGES = [
-            "ไฟต์โตะ! สู้เขานะ!",
+            "ไฟตโตะ! สู้เขานะ!",
             "เก่งมากเลย!",
             "เติบโตไปด้วยกันนะ 🌱",
             "พยายามได้ดีมาก!",
@@ -86,7 +152,6 @@
         ];
 
         const App = () => {
-            // State ทั้งหมด
             const [vocab] = useState(INITIAL_VOCAB);
             const [xp, setXp] = useState(0);
             const [waterDrops, setWaterDrops] = useState(0);
@@ -95,22 +160,18 @@
             const [quizStats, setQuizStats] = useState({ total: 0, correct: 0 });
             const [gardenName, setGardenName] = useState("สวนพฤกษศาสตร์ของฉัน");
             
-            // หน้าต่าง UI
             const [view, setView] = useState('home'); 
             const [filter, setFilter] = useState('All');
             
-            // Flashcard State
             const [cardIndex, setCardIndex] = useState(0);
             const [isFlipped, setIsFlipped] = useState(false);
             const [flashcardMode, setFlashcardMode] = useState('term'); 
             
-            // Quiz State
             const [quizQuestions, setQuizQuestions] = useState([]);
             const [currentQuestion, setCurrentQuestion] = useState(0);
             const [quizScore, setQuizScore] = useState(0);
             const [quizFinished, setQuizFinished] = useState(false);
 
-            // โหลดข้อมูลจาก LocalStorage
             useEffect(() => {
                 const saved = localStorage.getItem('phytoAppState');
                 if (saved) {
@@ -124,14 +185,12 @@
                 }
             }, []);
 
-            // บันทึกข้อมูลลง LocalStorage
             useEffect(() => {
                 localStorage.setItem('phytoAppState', JSON.stringify({
                     xp, waterDrops, memorized, collection, quizStats, gardenName
                 }));
             }, [xp, waterDrops, memorized, collection, quizStats, gardenName]);
 
-            // คำนวณระยะต้นไม้
             const currentStage = useMemo(() => {
                 return [...PLANT_STAGES].reverse().find(stage => xp >= stage.threshold) || PLANT_STAGES[0];
             }, [xp]);
@@ -159,10 +218,10 @@
             const handleHarvest = () => {
                 if (xp >= 100) {
                     const randomPlant = PLANT_RESULTS[Math.floor(Math.random() * PLANT_RESULTS.length)];
-                    setCollection(prev => [...prev, { 
+                    setCollection([...collection, { 
                         id: Date.now(), 
                         type: randomPlant.icon, 
-                        name: randomPlant.name, // บันทึกชื่อเริ่มต้นของพืช
+                        name: randomPlant.name,
                         date: new Date().toLocaleDateString() 
                     }]);
                     setXp(0);
@@ -172,31 +231,44 @@
 
             const markAsMemorized = (id) => {
                 if (!memorized.includes(id)) {
-                    setMemorized(prev => [...prev, id]);
+                    setMemorized([...memorized, id]);
                     setWaterDrops(prev => prev + 5);
                 }
                 setIsFlipped(false);
                 setCardIndex(prev => (prev + 1) % filteredVocab.length);
             };
 
-            // ✅ ฟังก์ชันสำหรับเปลี่ยนชื่อต้นไม้ในคอลเลกชัน
             const renamePlant = (id, currentName) => {
                 const newName = prompt("ตั้งชื่อให้ต้นไม้ของคุณ:", currentName);
-                if (newName !== null && newName.trim() !== "") {
-                    setCollection(prev => prev.map(plant => 
+                if (newName && newName.trim() !== "") {
+                    setCollection(collection.map(plant => 
                         plant.id === id ? { ...plant, name: newName.trim() } : plant
                     ));
                 }
             };
 
+            // ✅ ฟังก์ชันสุ่มข้อสอบแบบฉลาด (ป้องกันตัวลวงซับเซต)
             const startQuiz = () => {
                 const shuffled = [...vocab].sort(() => 0.5 - Math.random()).slice(0, 5);
                 const questions = shuffled.map(v => {
                     const wrongOptions = vocab
-                        .filter(opt => opt.id !== v.id)
+                        .filter(opt => {
+                            // 1. ห้ามเป็นข้อที่ถูก
+                            if (opt.id === v.id) return false;
+                            
+                            // 2. เช็คว่าเป็นข้อที่อยู่ในหมวดหมู่ซับเซตต้องห้ามหรือไม่
+                            const vConflicts = v.conflicts || [];
+                            const optConflicts = opt.conflicts || [];
+                            
+                            // ถ้าฝั่งคำถามห้ามช้อยส์นี้ หรือ ฝั่งช้อยส์ห้ามคำถามนี้ ให้เตะออก
+                            if (vConflicts.includes(opt.id) || optConflicts.includes(v.id)) return false;
+                            
+                            return true;
+                        })
                         .sort(() => 0.5 - Math.random())
                         .slice(0, 3)
                         .map(opt => opt.def);
+                        
                     return {
                         vocab: v,
                         options: [v.def, ...wrongOptions].sort(() => 0.5 - Math.random())
@@ -463,11 +535,8 @@
                     ) : (
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-12 gap-x-4 w-full mt-6">
                             {collection.map(plant => {
-                                // ดึงข้อความให้กำลังใจโดยใช้ id เป็นตัวกำหนด เพื่อให้ข้อความไม่เปลี่ยนไปมาตอนรีเฟรช
                                 const messageIndex = plant.id % ENCOURAGING_MESSAGES.length;
                                 const message = ENCOURAGING_MESSAGES[messageIndex];
-                                
-                                // ป้องกัน Error กรณีต้นไม้เก่าที่ไม่มีชื่อบันทึกไว้
                                 const defaultName = PLANT_RESULTS.find(p => p.icon === plant.type)?.name || "พืชปริศนา";
                                 const displayName = plant.name || defaultName;
 
@@ -504,27 +573,20 @@
             );
 
             return (
-                <div className="p-4 pt-8 min-h-[95vh] flex flex-col">
-                    <div className="flex-grow">
-                        <div className="max-w-md mx-auto flex justify-end gap-3 mb-6">
-                            <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-bold flex items-center gap-1 shadow-sm">
-                                💧 {waterDrops}
-                            </div>
-                            <div className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full font-bold flex items-center gap-1 shadow-sm cursor-pointer" onClick={() => setView('collection')}>
-                                🏆 {collection.length}
-                            </div>
+                <div className="p-4 pt-8">
+                    <div className="max-w-md mx-auto flex justify-end gap-3 mb-6">
+                        <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-bold flex items-center gap-1 shadow-sm">
+                            💧 {waterDrops}
                         </div>
+                        <div className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full font-bold flex items-center gap-1 shadow-sm cursor-pointer" onClick={() => setView('collection')}>
+                            🏆 {collection.length}
+                        </div>
+                    </div>
 
-                        {view === 'home' && renderHome()}
-                        {view === 'flashcard' && renderFlashcard()}
-                        {view === 'quiz' && renderQuiz()}
-                        {view === 'collection' && renderCollection()}
-                    </div>
-                    
-                    {/* ✅ Footer ลิขสิทธิ์ */}
-                    <div className="mt-10 text-center text-xs font-medium text-green-700/60 pb-2">
-                        &copy; ลิขสิทธิ์ของ Bio after meals (พัฒนาโดยพรธรรมมิก นามแดง)
-                    </div>
+                    {view === 'home' && renderHome()}
+                    {view === 'flashcard' && renderFlashcard()}
+                    {view === 'quiz' && renderQuiz()}
+                    {view === 'collection' && renderCollection()}
                 </div>
             );
         };
@@ -532,5 +594,10 @@
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>
+
+    <!-- ✅ ใช้ฟอนต์ Sarabun และปรับขนาดตัวอักษรให้เล็กลงอีก (text-[9px]) เฉพาะที่นี่ -->
+    <footer className="text-center py-6 text-gray-400 text-[9px] border-t border-gray-200 mt-auto bg-white/50 font-light font-sarabun">
+        © 2026 ลิขสิทธิ์ของ Bio after meals (พัฒนาโดยพรธรรมมิก นามแดง)
+    </footer>
 </body>
 </html>
